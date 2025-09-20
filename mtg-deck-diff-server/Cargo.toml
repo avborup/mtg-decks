@@ -6,3 +6,5 @@ edition = "2024"
 [dependencies]
 serde = "1.0.225"
 sonic-rs = "0.5"
+axum = "0.7"
+tokio = { version = "1.0", features = ["full"] }
