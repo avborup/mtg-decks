@@ -10,7 +10,8 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::sync::Arc;
 use std::time::Instant;
-use tracing::{debug, info, instrument, warn};
+use tracing::{debug, info, instrument, level_filters::LevelFilter, warn};
+use tracing_subscriber::EnvFilter;
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 struct Card {
@@ -77,7 +78,11 @@ async fn get_card_by_name(
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt()
-        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+        .with_env_filter(
+            EnvFilter::builder()
+                .with_default_directive(LevelFilter::INFO.into())
+                .from_env_lossy(),
+        )
         .init();
 
     let cards = load_cards()?;
@@ -86,9 +91,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/cards/:name", get(get_card_by_name))
         .with_state(cards);
 
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000").await?;
-    info!("MTG Card Server listening on http://127.0.0.1:3000");
-    info!("Try: curl http://127.0.0.1:3000/cards/Lightning%20Bolt");
+    let address = "127.0.0.1:5678";
+    let listener = tokio::net::TcpListener::bind(address).await?;
+
+    info!("Server listening on http://{address}");
+    info!("Try: curl http://{address}/cards/Rashmi%20and%20Ragavan");
 
     axum::serve(listener, app).await?;
 
