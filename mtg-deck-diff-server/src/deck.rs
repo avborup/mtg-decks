@@ -2,7 +2,7 @@ use regex::Regex;
 use serde::{Deserialize, Serialize};
 use tracing::debug;
 
-use crate::cards::{Card, CardMap};
+use crate::cards::{Card, CardMap, get_card_by_name};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct DeckEntry {
@@ -73,7 +73,7 @@ pub fn resolve_deck_list(input: &str, cards: &CardMap) -> DeckResolveResult {
                 }
 
                 // Resolve card immediately during parsing
-                let card = cards.get(&name).cloned();
+                let card = get_card_by_name(cards, &name);
                 if card.is_none() {
                     debug!("Card not found: {}", name);
                 }
@@ -209,7 +209,7 @@ xInvalid Format
     fn test_resolve_with_card_resolution() {
         let mut card_map = HashMap::new();
         let bolt_card = create_test_card("Lightning Bolt");
-        card_map.insert("Lightning Bolt".to_string(), bolt_card.clone());
+        card_map.insert("Lightning Bolt".to_string(), vec![bolt_card.clone()]);
         let cards = Arc::new(card_map);
 
         let input = r#"
@@ -238,8 +238,8 @@ xInvalid Format
     #[test]
     fn test_resolve_multiple_categories() {
         let mut card_map = HashMap::new();
-        card_map.insert("Lightning Bolt".to_string(), create_test_card("Lightning Bolt"));
-        card_map.insert("Forest".to_string(), create_test_card("Forest"));
+        card_map.insert("Lightning Bolt".to_string(), vec![create_test_card("Lightning Bolt")]);
+        card_map.insert("Forest".to_string(), vec![create_test_card("Forest")]);
         let cards = Arc::new(card_map);
 
         let input = r#"

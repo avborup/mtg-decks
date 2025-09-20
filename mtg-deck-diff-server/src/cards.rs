@@ -30,7 +30,7 @@ pub struct ImageUris {
     // pub border_crop: String,
 }
 
-pub type CardMap = Arc<HashMap<String, Card>>;
+pub type CardMap = Arc<HashMap<String, Vec<Card>>>;
 
 #[instrument]
 pub fn load_cards() -> Result<CardMap, Box<dyn std::error::Error>> {
@@ -41,22 +41,27 @@ pub fn load_cards() -> Result<CardMap, Box<dyn std::error::Error>> {
     let file = File::open("data/oracle-cards-20250919090345.json")?;
     let cards: Vec<Card> = sonic_rs::from_reader(file)?;
 
-    // This has the gotcha that duplicate names will be overwritten, which is especially the case
-    // for tokens and extra cards.
-    let card_map = HashMap::from_iter(cards.into_iter().map(|card| (card.name.clone(), card)));
+    // Group cards by name to preserve duplicates (especially important for tokens and extra cards)
+    let mut card_map: HashMap<String, Vec<Card>> = HashMap::new();
+    for card in cards {
+        card_map.entry(card.name.clone()).or_insert_with(Vec::new).push(card);
+    }
 
     let load_duration = load_start.elapsed();
+    let unique_names = card_map.len();
+    let total_cards: usize = card_map.values().map(|cards| cards.len()).sum();
     info!(
-        card_count = card_map.len(),
+        unique_names = unique_names,
+        total_cards = total_cards,
         load_time_ms = load_duration.as_millis(),
-        "Successfully loaded unique cards"
+        "Successfully loaded cards"
     );
 
     Ok(Arc::new(card_map))
 }
 
 pub fn get_card_by_name(cards: &CardMap, name: &str) -> Option<Card> {
-    cards.get(name).cloned()
+    cards.get(name).and_then(|card_vec| card_vec.first().cloned())
 }
 
 #[cfg(test)]
@@ -79,7 +84,7 @@ mod tests {
             image_status: "highres_scan".to_string(),
             image_uris: None,
         };
-        card_map.insert("Lightning Bolt".to_string(), test_card.clone());
+        card_map.insert("Lightning Bolt".to_string(), vec![test_card.clone()]);
         let cards = Arc::new(card_map);
 
         let result = get_card_by_name(&cards, "Lightning Bolt");
@@ -98,7 +103,7 @@ mod tests {
             image_status: "highres_scan".to_string(),
             image_uris: None,
         };
-        card_map.insert("Lightning Bolt".to_string(), test_card);
+        card_map.insert("Lightning Bolt".to_string(), vec![test_card]);
         let cards = Arc::new(card_map);
 
         assert!(get_card_by_name(&cards, "Lightning Bolt").is_some());
