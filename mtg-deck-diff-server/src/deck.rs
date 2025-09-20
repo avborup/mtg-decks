@@ -10,7 +10,7 @@ pub struct DeckEntry {
     pub name: String,
     pub set_code: Option<String>,
     pub collector_number: Option<String>,
-    pub category: Option<String>,
+    pub categories: Vec<String>,
     pub card: Option<Card>,
 }
 
@@ -50,7 +50,9 @@ pub fn resolve_deck_list(input: &str, cards: &CardMap) -> DeckResolveResult {
                 let name = caps.get(2).unwrap().as_str().trim().to_string();
                 let set_code = caps.get(3).map(|m| m.as_str().to_string());
                 let collector_number = caps.get(4).map(|m| m.as_str().to_string());
-                let category = caps.get(5).map(|m| m.as_str().to_string());
+                let categories = caps.get(5)
+                    .map(|m| m.as_str().split(',').map(|c| c.trim().to_string()).collect())
+                    .unwrap_or_else(Vec::new);
 
                 if quantity == 0 {
                     errors.push(ParseError {
@@ -82,7 +84,7 @@ pub fn resolve_deck_list(input: &str, cards: &CardMap) -> DeckResolveResult {
                     name,
                     set_code,
                     collector_number,
-                    category,
+                    categories,
                     card,
                 });
             }
@@ -135,7 +137,7 @@ mod tests {
         assert_eq!(entry.name, "Lightning Bolt");
         assert_eq!(entry.set_code, None);
         assert_eq!(entry.collector_number, None);
-        assert_eq!(entry.category, None);
+        assert_eq!(entry.categories, Vec::<String>::new());
         assert_eq!(entry.card, None); // Card not found
     }
 
@@ -154,7 +156,7 @@ mod tests {
         assert_eq!(entry.name, "Blasphemous Act");
         assert_eq!(entry.set_code, Some("eoc".to_string()));
         assert_eq!(entry.collector_number, Some("86".to_string()));
-        assert_eq!(entry.category, Some("Removal".to_string()));
+        assert_eq!(entry.categories, vec!["Removal".to_string()]);
         assert_eq!(entry.card, None); // Card not found
     }
 
@@ -231,5 +233,43 @@ xInvalid Format
         // Second entry should not have card resolved
         assert!(result.entries[1].card.is_none());
         assert_eq!(result.entries[1].name, "Nonexistent Card");
+    }
+
+    #[test]
+    fn test_resolve_multiple_categories() {
+        let mut card_map = HashMap::new();
+        card_map.insert("Lightning Bolt".to_string(), create_test_card("Lightning Bolt"));
+        card_map.insert("Forest".to_string(), create_test_card("Forest"));
+        let cards = Arc::new(card_map);
+
+        let input = r#"
+1x Lightning Bolt [Removal, Burn, Instant]
+1x Forest [Land]
+1x Sol Ring [Artifact, Ramp]
+        "#;
+
+        let result = resolve_deck_list(input, &cards);
+
+        assert_eq!(result.entries.len(), 3);
+        assert_eq!(result.errors.len(), 0);
+        assert_eq!(result.total_cards, 3);
+
+        // Check multiple categories for Lightning Bolt
+        assert_eq!(result.entries[0].categories.len(), 3);
+        assert_eq!(result.entries[0].categories[0], "Removal");
+        assert_eq!(result.entries[0].categories[1], "Burn");
+        assert_eq!(result.entries[0].categories[2], "Instant");
+        assert!(result.entries[0].card.is_some()); // Lightning Bolt found
+
+        // Check single category for Forest
+        assert_eq!(result.entries[1].categories.len(), 1);
+        assert_eq!(result.entries[1].categories[0], "Land");
+        assert!(result.entries[1].card.is_some()); // Forest found
+
+        // Check multiple categories for Sol Ring (card not found)
+        assert_eq!(result.entries[2].categories.len(), 2);
+        assert_eq!(result.entries[2].categories[0], "Artifact");
+        assert_eq!(result.entries[2].categories[1], "Ramp");
+        assert!(result.entries[2].card.is_none()); // Sol Ring not found
     }
 }
