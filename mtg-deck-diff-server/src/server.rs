@@ -20,7 +20,7 @@ pub async fn get_card_by_name_handler(
     match get_card_by_name(&cards, &name) {
         Some(card) => {
             debug!(card_name = %name, "Card found");
-            Ok(Json(card))
+            Ok(Json(card.clone()))
         }
         None => {
             warn!(card_name = %name, "Card not found");
