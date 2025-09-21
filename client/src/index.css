@@ -1,6 +1,17 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Force generation of commonly used custom classes */
+.bg-background,
+.text-foreground,
+.text-muted-foreground,
+.bg-card,
+.text-card-foreground,
+.bg-primary,
+.text-primary-foreground,
+.bg-secondary,
+.text-secondary-foreground {
+  /* This ensures these classes are generated */
+}
 
 @layer base {
   :root {
