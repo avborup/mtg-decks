@@ -105,6 +105,131 @@ pub fn resolve_deck_list(input: &str, cards: &CardMap) -> DeckResolveResult {
     }
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DeckDiffEntry {
+    pub card_name: String,
+    pub old_quantity: u32,
+    pub new_quantity: u32,
+    pub change_type: String, // "added", "removed", "modified", "unchanged"
+    pub card: Option<Card>,
+    pub categories: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DeckDiffRequest {
+    pub deck_list_1: String,
+    pub deck_list_2: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DeckDiffResult {
+    pub added: Vec<DeckDiffEntry>,
+    pub removed: Vec<DeckDiffEntry>,
+    pub modified: Vec<DeckDiffEntry>,
+    pub unchanged: Vec<DeckDiffEntry>,
+    pub errors_deck_1: Vec<ParseError>,
+    pub errors_deck_2: Vec<ParseError>,
+}
+
+pub fn diff_decks(deck1_input: &str, deck2_input: &str, cards: &CardMap) -> DeckDiffResult {
+    let deck1_result = resolve_deck_list(deck1_input, cards);
+    let deck2_result = resolve_deck_list(deck2_input, cards);
+
+    // Create maps for easier comparison
+    let mut deck1_map = std::collections::HashMap::new();
+    for entry in &deck1_result.entries {
+        deck1_map.insert(entry.card.name.clone(), entry);
+    }
+
+    let mut deck2_map = std::collections::HashMap::new();
+    for entry in &deck2_result.entries {
+        deck2_map.insert(entry.card.name.clone(), entry);
+    }
+
+    let mut added = Vec::new();
+    let mut removed = Vec::new();
+    let mut modified = Vec::new();
+    let mut unchanged = Vec::new();
+
+    // Find all unique card names
+    let all_cards: std::collections::HashSet<String> = deck1_map
+        .keys()
+        .chain(deck2_map.keys())
+        .cloned()
+        .collect();
+
+    for card_name in all_cards {
+        let deck1_entry = deck1_map.get(&card_name);
+        let deck2_entry = deck2_map.get(&card_name);
+
+        match (deck1_entry, deck2_entry) {
+            (None, Some(entry2)) => {
+                // Card added in deck 2
+                added.push(DeckDiffEntry {
+                    card_name: card_name.clone(),
+                    old_quantity: 0,
+                    new_quantity: entry2.quantity,
+                    change_type: "added".to_string(),
+                    card: Some(entry2.card.clone()),
+                    categories: entry2.categories.clone(),
+                });
+            }
+            (Some(entry1), None) => {
+                // Card removed from deck 2
+                removed.push(DeckDiffEntry {
+                    card_name: card_name.clone(),
+                    old_quantity: entry1.quantity,
+                    new_quantity: 0,
+                    change_type: "removed".to_string(),
+                    card: Some(entry1.card.clone()),
+                    categories: entry1.categories.clone(),
+                });
+            }
+            (Some(entry1), Some(entry2)) => {
+                if entry1.quantity != entry2.quantity {
+                    // Quantity changed
+                    modified.push(DeckDiffEntry {
+                        card_name: card_name.clone(),
+                        old_quantity: entry1.quantity,
+                        new_quantity: entry2.quantity,
+                        change_type: "modified".to_string(),
+                        card: Some(entry2.card.clone()),
+                        categories: entry2.categories.clone(),
+                    });
+                } else {
+                    // No change
+                    unchanged.push(DeckDiffEntry {
+                        card_name: card_name.clone(),
+                        old_quantity: entry1.quantity,
+                        new_quantity: entry2.quantity,
+                        change_type: "unchanged".to_string(),
+                        card: Some(entry1.card.clone()),
+                        categories: entry1.categories.clone(),
+                    });
+                }
+            }
+            (None, None) => {
+                // This shouldn't happen given our logic above
+            }
+        }
+    }
+
+    // Sort entries by card name for consistent output
+    added.sort_by(|a, b| a.card_name.cmp(&b.card_name));
+    removed.sort_by(|a, b| a.card_name.cmp(&b.card_name));
+    modified.sort_by(|a, b| a.card_name.cmp(&b.card_name));
+    unchanged.sort_by(|a, b| a.card_name.cmp(&b.card_name));
+
+    DeckDiffResult {
+        added,
+        removed,
+        modified,
+        unchanged,
+        errors_deck_1: deck1_result.errors,
+        errors_deck_2: deck2_result.errors,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

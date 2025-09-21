@@ -29,6 +29,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     info!("  GET  /health           - Health check endpoint");
     info!("  GET  /cards/:name      - Get card by name");
     info!("  POST /deck/resolve     - Parse and resolve deck list with full card data");
+    info!("  POST /deck/diff        - Compare two deck lists and show differences");
     info!("Try: curl http://{address}/cards/Rashmi%20and%20Ragavan");
 
     axum::serve(listener, app).await?;

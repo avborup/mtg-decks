@@ -10,7 +10,7 @@ use tower_http::cors::CorsLayer;
 use tracing::{debug, instrument, warn};
 
 use crate::cards::{Card, CardMap, get_card_by_name};
-use crate::deck::{DeckResolveResult, resolve_deck_list};
+use crate::deck::{DeckResolveResult, resolve_deck_list, DeckDiffRequest, DeckDiffResult, diff_decks};
 
 #[derive(Serialize)]
 pub struct HealthResponse {
@@ -63,11 +63,30 @@ pub async fn resolve_deck_handler(
     Ok(Json(result))
 }
 
+#[instrument(skip_all)]
+pub async fn diff_deck_handler(
+    State(cards): State<CardMap>,
+    Json(request): Json<DeckDiffRequest>,
+) -> Result<Json<DeckDiffResult>, StatusCode> {
+    let result = diff_decks(&request.deck_list_1, &request.deck_list_2, &cards);
+    debug!(
+        added_count = result.added.len(),
+        removed_count = result.removed.len(),
+        modified_count = result.modified.len(),
+        unchanged_count = result.unchanged.len(),
+        errors_deck_1 = result.errors_deck_1.len(),
+        errors_deck_2 = result.errors_deck_2.len(),
+        "Deck diff processing completed"
+    );
+    Ok(Json(result))
+}
+
 pub fn create_router(cards: CardMap) -> Router {
     Router::new()
         .route("/health", get(health_check_handler))
         .route("/cards/:name", get(get_card_by_name_handler))
         .route("/deck/resolve", post(resolve_deck_handler))
+        .route("/deck/diff", post(diff_deck_handler))
         .layer(CorsLayer::permissive())
         .with_state(cards)
 }

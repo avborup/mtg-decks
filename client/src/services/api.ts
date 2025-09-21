@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { DeckResolveResult, Card } from '@/types/api';
+import type { DeckResolveResult, Card, DeckDiffRequest, DeckDiffResult } from '@/types/api';
 
 const API_BASE_URL = 'http://127.0.0.1:5678';
 
@@ -17,6 +17,11 @@ export const deckService = {
         'Content-Type': 'text/plain',
       },
     });
+    return response.data;
+  },
+
+  async diffDecks(request: DeckDiffRequest): Promise<DeckDiffResult> {
+    const response = await api.post('/deck/diff', request);
     return response.data;
   },
 };

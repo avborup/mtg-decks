@@ -15,6 +15,9 @@
 - [x] Create ErrorDisplay component for parsing errors
 - [x] Create DeckStats component for deck statistics
 - [x] Integrate all components in main App component
+- [x] Create DeckDiff component for comparing two deck lists
+- [x] Add tabbed interface to switch between Deck Viewer and Deck Diff
+- [x] Implement git-diff style visual representation with color coding
 
 ### Bug Fixes & Code Quality
 - [x] Fix API type mismatches between TypeScript and Rust backend
@@ -30,18 +33,24 @@
 - [x] Add health check endpoint to server (/health)
 - [x] Include service status, version, and cards loaded count in health response
 - [x] Update server logging to include health check endpoint
+- [x] Add deck diff endpoint to server (/deck/diff)
+- [x] Implement git-diff style deck comparison logic
+- [x] Add comprehensive diff result types and error handling
 
 ### Documentation
 - [x] Create TODO.md file for progress tracking
 
 ## 🔄 In Progress
-- Currently testing and optimizing based on comprehensive test results
+- Deck diff functionality completed and fully tested!
 
 ### Testing & Quality Assurance
 - [x] Test with various deck list formats (backend integration verified)
 - [x] Test error handling and edge cases (all scenarios working correctly)
 - [x] Verify card image loading and fallbacks (Scryfall URLs accessible)
 - [x] Test responsive design on different screen sizes (Tailwind responsive classes confirmed)
+- [x] Test deck diff functionality with comprehensive scenarios
+- [x] Verify diff error handling (parsing errors, missing cards, empty decks)
+- [x] Test all diff change types (added, removed, modified, unchanged)
 
 ## 📋 Pending Tasks
 
@@ -54,7 +63,9 @@
 - [ ] Add card sorting options (name, quantity, type, etc.)
 - [ ] Implement deck validation rules
 - [ ] Add recent deck lists history
-- [ ] Add deck comparison features
+- [ ] Enhanced diff features (side-by-side view, copy changes, etc.)
+- [ ] Add diff export functionality (text, JSON)
+- [ ] Save and load deck diff sessions
 
 ### Performance & UX
 - [ ] Optimize API calls and add caching
@@ -70,15 +81,22 @@
 - [ ] Set up CI/CD pipeline
 
 ## 🎯 Current Focus
-All critical development tasks completed! The application has been thoroughly tested with the backend API server. All deck list formats work correctly, error handling is robust, and the responsive design is properly implemented. Both frontend and backend are fully functional and ready for production use.
+All critical development tasks completed including the new git-diff style deck comparison feature! The application now supports:
+- Comprehensive deck viewing with card resolution and validation
+- Git-diff style deck comparison showing added, removed, modified, and unchanged cards
+- Full error handling and edge case coverage
+- Responsive design with tabbed interface
+- Both frontend and backend are fully functional and production-ready.
 
 ## 📝 Notes
 - The API server should be running on `http://127.0.0.1:5678` for the client to work properly
 - Health check endpoint available at `GET /health` for monitoring server status
-- The application supports the deck format already implemented in the Rust API server
+- New deck diff endpoint available at `POST /deck/diff` for comparing two deck lists
+- The application supports the deck format: `{quantity}x {card_name} [optional categories]`
 - All components use shadcn/ui for consistent styling and accessibility
 - TypeScript interfaces match the Rust API structures for type safety
 - Tailwind CSS v4 is properly configured with @import syntax
+- Git-diff style comparison with visual color coding for different change types
 
 ## 🐛 Known Issues
 - None currently identified (all build errors, lint issues, and CSS problems resolved)
@@ -91,5 +109,9 @@ The application has been comprehensively tested and verified. All core functiona
 - ✅ Responsive design confirmed across all components
 - ✅ Card image loading with proper fallbacks
 - ✅ Health check monitoring endpoint functional
+- ✅ Git-diff style deck comparison with comprehensive change detection
+- ✅ Tabbed interface for switching between deck viewer and diff functionality
+- ✅ Full visual color coding for added/removed/modified/unchanged cards
+- ✅ Category support and proper error handling in diff comparisons
 
 Both frontend (http://localhost:5173) and backend (http://127.0.0.1:5678) are running successfully.
