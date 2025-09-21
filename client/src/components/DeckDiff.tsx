@@ -43,46 +43,11 @@ const DeckDiff: React.FC = () => {
 1x Blasphemous Act [Removal]`);
   };
 
-  const getChangeIcon = (changeType: string) => {
-    switch (changeType) {
-      case 'added':
-        return '+';
-      case 'removed':
-        return '-';
-      case 'modified':
-        return '~';
-      default:
-        return '=';
-    }
-  };
 
-  const getChangeColor = (changeType: string) => {
-    switch (changeType) {
-      case 'added':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      case 'removed':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-      case 'modified':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
-    }
-  };
 
   const renderDiffEntry = (entry: DeckDiffEntry, index: number) => (
     <div key={index} className="text-center relative">
       <div className="relative">
-        {/* Change indicator overlay */}
-        <div className="absolute top-2 left-2 z-10">
-          <span
-            className={`inline-flex items-center justify-center w-8 h-8 text-sm font-bold rounded-full shadow-md ${getChangeColor(
-              entry.change_type
-            )}`}
-          >
-            {getChangeIcon(entry.change_type)}
-          </span>
-        </div>
-
         {entry.card?.image_uris?.normal ? (
           <img
             src={entry.card.image_uris.normal}
@@ -105,16 +70,16 @@ const DeckDiff: React.FC = () => {
           {entry.change_type === 'added' && (
             <span>
               {entry.old_quantity > 0
-                ? `+${entry.new_quantity}x (was ${entry.old_quantity}x)`
-                : `+${entry.new_quantity}x`
+                ? `${entry.new_quantity}x (was ${entry.old_quantity}x)`
+                : `${entry.new_quantity}x`
               }
             </span>
           )}
           {entry.change_type === 'removed' && (
             <span>
               {entry.new_quantity > 0
-                ? `-${entry.old_quantity}x (now ${entry.new_quantity}x)`
-                : `-${entry.old_quantity}x`
+                ? `${entry.old_quantity}x (now ${entry.new_quantity}x)`
+                : `${entry.old_quantity}x`
               }
             </span>
           )}
