@@ -18,6 +18,9 @@
 - [x] Create DeckDiff component for comparing two deck lists
 - [x] Add tabbed interface to switch between Deck Viewer and Deck Diff
 - [x] Implement git-diff style visual representation with color coding
+- [x] Create ThemeToggle component with dark/light mode switching
+- [x] Add theme context and provider with localStorage persistence
+- [x] Integrate theme toggle button in main application header
 
 ### Bug Fixes & Code Quality
 - [x] Fix API type mismatches between TypeScript and Rust backend
@@ -60,7 +63,7 @@
 - [ ] Implement card hover effects with larger images
 - [ ] Add export functionality (JSON, CSV)
 - [ ] Add search/filter functionality for resolved cards
-- [ ] Add dark/light mode toggle
+- [x] Add dark/light mode toggle (completed)
 - [ ] Add card sorting options (name, quantity, type, etc.)
 - [ ] Implement deck validation rules
 - [ ] Add recent deck lists history
@@ -82,9 +85,10 @@
 - [ ] Set up CI/CD pipeline
 
 ## 🎯 Current Focus
-All critical development tasks completed including the new git-diff style deck comparison feature! The application now supports:
+All critical development tasks completed including git-diff style deck comparison and dark/light mode! The application now supports:
 - Comprehensive deck viewing with card resolution and validation
 - Git-diff style deck comparison showing added, removed, modified, and unchanged cards
+- Dark/light mode toggle with system preference detection and localStorage persistence
 - Full error handling and edge case coverage
 - Responsive design with tabbed interface
 - Both frontend and backend are fully functional and production-ready.
@@ -96,8 +100,9 @@ All critical development tasks completed including the new git-diff style deck c
 - The application supports the deck format: `{quantity}x {card_name} ({set}) {number} {*foil*} [{categories}]`
 - All components use shadcn/ui for consistent styling and accessibility
 - TypeScript interfaces match the Rust API structures for type safety
-- Tailwind CSS v4 is properly configured with @import syntax
+- Tailwind CSS v4 is properly configured with @import syntax and dark mode support
 - Git-diff style comparison with visual color coding for different change types
+- Dark/light mode toggle with automatic system preference detection and persistence
 
 ## 🐛 Known Issues
 - None currently identified (all build errors, lint issues, and CSS problems resolved)
@@ -114,5 +119,6 @@ The application has been comprehensively tested and verified. All core functiona
 - ✅ Tabbed interface for switching between deck viewer and diff functionality
 - ✅ Full visual color coding for added/removed/modified/unchanged cards
 - ✅ Category support and proper error handling in diff comparisons
+- ✅ Dark/light mode toggle with theme persistence and system preference detection
 
 Both frontend (http://localhost:5173) and backend (http://127.0.0.1:5678) are running successfully.

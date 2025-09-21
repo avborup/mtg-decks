@@ -4,6 +4,7 @@ import CardDisplay from '@/components/CardDisplay'
 import ErrorDisplay from '@/components/ErrorDisplay'
 import DeckStats from '@/components/DeckStats'
 import DeckDiff from '@/components/DeckDiff'
+import ThemeToggle from '@/components/ThemeToggle'
 import { Button } from '@/components/ui/button'
 import type { DeckResolveResult } from '@/types/api'
 
@@ -21,6 +22,11 @@ function App() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           <header className="text-center mb-8">
+            {/* Theme Toggle */}
+            <div className="flex justify-end mb-4">
+              <ThemeToggle />
+            </div>
+
             <h1 className="text-4xl font-bold mb-2">MTG Deck Tool</h1>
             <p className="text-xl text-muted-foreground">
               {activeTab === 'viewer'
