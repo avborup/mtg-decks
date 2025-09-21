@@ -28,6 +28,7 @@
 - [x] Fix Tailwind CSS v4 configuration and import syntax
 - [x] Resolve CSS not working issue with proper @import directive
 - [x] Update PostCSS configuration for Tailwind CSS v4 compatibility
+- [x] Fix parser regex to handle foil indicators (*F*, *FOIL*, *PREMIUM*)
 
 ### Backend Improvements
 - [x] Add health check endpoint to server (/health)
@@ -92,7 +93,7 @@ All critical development tasks completed including the new git-diff style deck c
 - The API server should be running on `http://127.0.0.1:5678` for the client to work properly
 - Health check endpoint available at `GET /health` for monitoring server status
 - New deck diff endpoint available at `POST /deck/diff` for comparing two deck lists
-- The application supports the deck format: `{quantity}x {card_name} [optional categories]`
+- The application supports the deck format: `{quantity}x {card_name} ({set}) {number} {*foil*} [{categories}]`
 - All components use shadcn/ui for consistent styling and accessibility
 - TypeScript interfaces match the Rust API structures for type safety
 - Tailwind CSS v4 is properly configured with @import syntax
