@@ -44,7 +44,10 @@ pub fn load_cards() -> Result<CardMap, Box<dyn std::error::Error>> {
     // Group cards by name to preserve duplicates (especially important for tokens and extra cards)
     let mut card_map: HashMap<String, Vec<Card>> = HashMap::new();
     for card in cards {
-        card_map.entry(card.name.clone()).or_insert_with(Vec::new).push(card);
+        card_map
+            .entry(card.name.clone())
+            .or_insert_with(Vec::new)
+            .push(card);
     }
 
     let load_duration = load_start.elapsed();
@@ -60,8 +63,8 @@ pub fn load_cards() -> Result<CardMap, Box<dyn std::error::Error>> {
     Ok(Arc::new(card_map))
 }
 
-pub fn get_card_by_name(cards: &CardMap, name: &str) -> Option<Card> {
-    cards.get(name).and_then(|card_vec| card_vec.first().cloned())
+pub fn get_card_by_name<'a>(cards: &'a CardMap, name: &str) -> Option<&'a Card> {
+    cards.get(name).and_then(|card_vec| card_vec.first())
 }
 
 #[cfg(test)]
@@ -111,3 +114,4 @@ mod tests {
         assert!(get_card_by_name(&cards, "LIGHTNING BOLT").is_none());
     }
 }
+

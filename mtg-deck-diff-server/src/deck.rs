@@ -1,17 +1,13 @@
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use tracing::debug;
 
 use crate::cards::{Card, CardMap, get_card_by_name};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct DeckEntry {
-    pub quantity: u32,
-    pub name: String,
-    pub set_code: Option<String>,
-    pub collector_number: Option<String>,
     pub categories: Vec<String>,
-    pub card: Option<Card>,
+    pub quantity: u32,
+    pub card: Card,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -48,10 +44,14 @@ pub fn resolve_deck_list(input: &str, cards: &CardMap) -> DeckResolveResult {
             Some(caps) => {
                 let quantity = caps.get(1).unwrap().as_str().parse::<u32>().unwrap_or(0);
                 let name = caps.get(2).unwrap().as_str().trim().to_string();
-                let set_code = caps.get(3).map(|m| m.as_str().to_string());
-                let collector_number = caps.get(4).map(|m| m.as_str().to_string());
-                let categories = caps.get(5)
-                    .map(|m| m.as_str().split(',').map(|c| c.trim().to_string()).collect())
+                let categories = caps
+                    .get(5)
+                    .map(|m| {
+                        m.as_str()
+                            .split(',')
+                            .map(|c| c.trim().to_string())
+                            .collect()
+                    })
                     .unwrap_or_else(Vec::new);
 
                 if quantity == 0 {
@@ -72,20 +72,20 @@ pub fn resolve_deck_list(input: &str, cards: &CardMap) -> DeckResolveResult {
                     continue;
                 }
 
-                // Resolve card immediately during parsing
-                let card = get_card_by_name(cards, &name);
-                if card.is_none() {
-                    debug!("Card not found: {}", name);
-                }
+                let Some(card) = get_card_by_name(cards, &name).cloned() else {
+                    errors.push(ParseError {
+                        line_number: line_number + 1,
+                        line: line.to_string(),
+                        error: format!("Card not found: {}", name),
+                    });
+                    continue;
+                };
 
                 total_cards += quantity;
                 entries.push(DeckEntry {
-                    quantity,
-                    name,
-                    set_code,
-                    collector_number,
                     categories,
                     card,
+                    quantity,
                 });
             }
             None => {
@@ -238,7 +238,10 @@ xInvalid Format
     #[test]
     fn test_resolve_multiple_categories() {
         let mut card_map = HashMap::new();
-        card_map.insert("Lightning Bolt".to_string(), vec![create_test_card("Lightning Bolt")]);
+        card_map.insert(
+            "Lightning Bolt".to_string(),
+            vec![create_test_card("Lightning Bolt")],
+        );
         card_map.insert("Forest".to_string(), vec![create_test_card("Forest")]);
         let cards = Arc::new(card_map);
 
