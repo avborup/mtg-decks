@@ -26,7 +26,7 @@ pub struct DeckResolveResult {
 
 pub fn resolve_deck_list(input: &str, cards: &CardMap) -> DeckResolveResult {
     let re =
-        Regex::new(r"^(\d+)x\s+(.+?)(?:\s+\(([^)]+)\)\s+(\S+))?(?:\s+\[([^\]]+)\])?$").unwrap();
+        Regex::new(r"^(\d+)x\s+(.+?)(?:\s+\(([^)]+)\)\s+(\S+)(?:\s+\*[^*]*\*)?)?(?:\s+\[([^\]]+)\])?$").unwrap();
 
     let mut entries = Vec::new();
     let mut errors = Vec::new();
