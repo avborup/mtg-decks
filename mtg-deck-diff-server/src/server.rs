@@ -5,6 +5,7 @@ use axum::{
     response::Json,
     routing::{get, post},
 };
+use tower_http::cors::CorsLayer;
 use tracing::{debug, instrument, warn};
 
 use crate::cards::{Card, CardMap, get_card_by_name};
@@ -47,5 +48,6 @@ pub fn create_router(cards: CardMap) -> Router {
     Router::new()
         .route("/cards/:name", get(get_card_by_name_handler))
         .route("/deck/resolve", post(resolve_deck_handler))
+        .layer(CorsLayer::permissive())
         .with_state(cards)
 }
