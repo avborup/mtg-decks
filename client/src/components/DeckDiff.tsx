@@ -86,10 +86,20 @@ const DeckDiff: React.FC<DeckDiffProps> = () => {
           </div>
           <div className="text-sm text-muted-foreground space-y-1">
             {entry.change_type === 'added' && (
-              <p>Added: {entry.new_quantity}x</p>
+              <p>
+                {entry.old_quantity > 0
+                  ? `Increased by: ${entry.new_quantity}x (was ${entry.old_quantity}x)`
+                  : `Added: ${entry.new_quantity}x`
+                }
+              </p>
             )}
             {entry.change_type === 'removed' && (
-              <p>Removed: {entry.old_quantity}x</p>
+              <p>
+                {entry.new_quantity > 0
+                  ? `Decreased by: ${entry.old_quantity}x (now ${entry.new_quantity}x)`
+                  : `Removed: ${entry.old_quantity}x`
+                }
+              </p>
             )}
             {entry.change_type === 'modified' && (
               <p>
