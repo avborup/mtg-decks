@@ -36,23 +36,30 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ entries }) => {
           {cardEntries.map((entry, index) => (
             <div key={index} className="group">
               <div className="relative">
-                {entry.card.image_uris?.normal ? (
-                  <img
-                    src={entry.card.image_uris.normal}
-                    alt={entry.card.name}
-                    className="w-full max-w-[200px] mx-auto rounded-lg shadow-md border transition-all duration-300 hover:shadow-lg hover:border-primary/50"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                ) : (
-                  <div className="w-full max-w-[200px] mx-auto aspect-[5/7] bg-muted rounded-lg flex items-center justify-center border-2 border-dashed border-border">
-                    <div className="text-center">
-                      <div className="text-muted-foreground text-sm mb-1">📄</div>
-                      <span className="text-xs text-muted-foreground">No Image</span>
+                <a
+                  href={`https://scryfall.com/search?q=${encodeURIComponent(entry.card.name)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block cursor-pointer"
+                >
+                  {entry.card.image_uris?.normal ? (
+                    <img
+                      src={entry.card.image_uris.normal}
+                      alt={entry.card.name}
+                      className="w-full max-w-[200px] mx-auto rounded-lg shadow-md border transition-all duration-300 hover:shadow-lg hover:border-primary/50"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full max-w-[200px] mx-auto aspect-[5/7] bg-muted rounded-lg flex items-center justify-center border-2 border-dashed border-border">
+                      <div className="text-center">
+                        <div className="text-muted-foreground text-sm mb-1">📄</div>
+                        <span className="text-xs text-muted-foreground">No Image</span>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </a>
 
                 {/* Quantity badge */}
                 {entry.quantity > 1 && (
