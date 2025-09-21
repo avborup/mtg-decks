@@ -26,6 +26,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     info!("Server listening on http://{address}");
     info!("Available endpoints:");
+    info!("  GET  /health           - Health check endpoint");
     info!("  GET  /cards/:name      - Get card by name");
     info!("  POST /deck/resolve     - Parse and resolve deck list with full card data");
     info!("Try: curl http://{address}/cards/Rashmi%20and%20Ragavan");
