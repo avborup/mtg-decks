@@ -4,10 +4,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { DeckDiffResult, DeckDiffEntry } from '@/types/api';
 import { deckService } from '@/services/api';
+import { sortDiffEntries, isCommander, isLand } from '@/lib/cardUtils';
 
-interface DeckDiffProps {}
-
-const DeckDiff: React.FC<DeckDiffProps> = () => {
+const DeckDiff: React.FC = () => {
   const [deck1Text, setDeck1Text] = useState('');
   const [deck2Text, setDeck2Text] = useState('');
   const [diffResult, setDiffResult] = useState<DeckDiffResult | null>(null);
@@ -71,70 +70,64 @@ const DeckDiff: React.FC<DeckDiffProps> = () => {
   };
 
   const renderDiffEntry = (entry: DeckDiffEntry, index: number) => (
-    <div key={index} className="border rounded-lg p-4 space-y-2">
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <span
-              className={`inline-flex items-center justify-center w-6 h-6 text-sm font-bold rounded-full ${getChangeColor(
-                entry.change_type
-              )}`}
-            >
-              {getChangeIcon(entry.change_type)}
-            </span>
-            <h3 className="font-semibold text-lg">{entry.card_name}</h3>
-          </div>
-          <div className="text-sm text-muted-foreground space-y-1">
-            {entry.change_type === 'added' && (
-              <p>
-                {entry.old_quantity > 0
-                  ? `Increased by: ${entry.new_quantity}x (was ${entry.old_quantity}x)`
-                  : `Added: ${entry.new_quantity}x`
-                }
-              </p>
-            )}
-            {entry.change_type === 'removed' && (
-              <p>
-                {entry.new_quantity > 0
-                  ? `Decreased by: ${entry.old_quantity}x (now ${entry.new_quantity}x)`
-                  : `Removed: ${entry.old_quantity}x`
-                }
-              </p>
-            )}
-            {entry.change_type === 'modified' && (
-              <p>
-                Changed: {entry.old_quantity}x → {entry.new_quantity}x
-              </p>
-            )}
-            {entry.change_type === 'unchanged' && (
-              <p>Unchanged: {entry.old_quantity}x</p>
-            )}
-          </div>
+    <div key={index} className="text-center relative">
+      <div className="relative">
+        {/* Change indicator overlay */}
+        <div className="absolute top-2 left-2 z-10">
+          <span
+            className={`inline-flex items-center justify-center w-8 h-8 text-sm font-bold rounded-full shadow-md ${getChangeColor(
+              entry.change_type
+            )}`}
+          >
+            {getChangeIcon(entry.change_type)}
+          </span>
         </div>
-        {entry.card?.image_uris?.normal && (
+
+        {entry.card?.image_uris?.normal ? (
           <img
             src={entry.card.image_uris.normal}
             alt={entry.card_name}
-            className="w-16 h-22 object-cover rounded border"
+            className="w-full max-w-[200px] mx-auto rounded-lg shadow-md hover:shadow-lg transition-shadow"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
             }}
           />
+        ) : (
+          <div className="w-full max-w-[200px] mx-auto aspect-[5/7] bg-gray-200 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+            <span className="text-sm text-muted-foreground">No Image</span>
+          </div>
         )}
       </div>
 
-      {entry.categories.length > 0 && (
-        <div className="flex flex-wrap gap-1">
-          {entry.categories.map((category, catIndex) => (
-            <span
-              key={catIndex}
-              className="inline-flex items-center px-2 py-1 text-xs rounded-full bg-secondary text-secondary-foreground"
-            >
-              {category}
+      <div className="mt-2 text-sm space-y-1">
+        <div className="font-medium">{entry.card_name}</div>
+        <div className="text-muted-foreground">
+          {entry.change_type === 'added' && (
+            <span>
+              {entry.old_quantity > 0
+                ? `+${entry.new_quantity}x (was ${entry.old_quantity}x)`
+                : `+${entry.new_quantity}x`
+              }
             </span>
-          ))}
+          )}
+          {entry.change_type === 'removed' && (
+            <span>
+              {entry.new_quantity > 0
+                ? `-${entry.old_quantity}x (now ${entry.new_quantity}x)`
+                : `-${entry.old_quantity}x`
+              }
+            </span>
+          )}
+          {entry.change_type === 'modified' && (
+            <span>
+              {entry.old_quantity}x → {entry.new_quantity}x
+            </span>
+          )}
+          {entry.change_type === 'unchanged' && (
+            <span>{entry.old_quantity}x</span>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 
@@ -144,6 +137,30 @@ const DeckDiff: React.FC<DeckDiffProps> = () => {
     bgColor: string
   ) => {
     if (entries.length === 0) return null;
+
+    const sortedEntries = sortDiffEntries(entries);
+
+    // Group entries by category for display
+    const commanders = sortedEntries.filter(entry => isCommander(entry.categories));
+    const lands = sortedEntries.filter(entry => !isCommander(entry.categories) && isLand(entry.categories));
+    const others = sortedEntries.filter(entry => !isCommander(entry.categories) && !isLand(entry.categories));
+
+    const renderCardGrid = (cardEntries: DeckDiffEntry[], sectionTitle?: string) => {
+      if (cardEntries.length === 0) return null;
+
+      return (
+        <div className="space-y-4">
+          {sectionTitle && (
+            <h4 className="text-md font-semibold text-muted-foreground border-b pb-2">
+              {sectionTitle}
+            </h4>
+          )}
+          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {cardEntries.map(renderDiffEntry)}
+          </div>
+        </div>
+      );
+    };
 
     return (
       <Card className={`${bgColor} border-2`}>
@@ -155,10 +172,10 @@ const DeckDiff: React.FC<DeckDiffProps> = () => {
             </span>
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {entries.map(renderDiffEntry)}
-          </div>
+        <CardContent className="space-y-8">
+          {commanders.length > 0 && renderCardGrid(commanders)}
+          {others.length > 0 && renderCardGrid(others)}
+          {lands.length > 0 && renderCardGrid(lands, "Lands")}
         </CardContent>
       </Card>
     );
