@@ -15,58 +15,78 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    /* Light theme - Parchment inspired */
+    --background: 45 15% 97%;
+    --foreground: 30 10% 15%;
+    --card: 45 20% 95%;
+    --card-foreground: 30 10% 15%;
+    --popover: 45 20% 95%;
+    --popover-foreground: 30 10% 15%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 40 20% 90%;
+    --secondary-foreground: 30 10% 25%;
+    --muted: 40 15% 92%;
+    --muted-foreground: 30 8% 50%;
+    --accent: 40 20% 90%;
+    --accent-foreground: 30 10% 25%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 40 15% 85%;
+    --input: 40 15% 85%;
+    --ring: 217 91% 60%;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+
+    /* MTG Color Variables */
+    --mana-white: 60 8% 90%;
+    --mana-blue: 213 100% 35%;
+    --mana-black: 0 0% 8%;
+    --mana-red: 1 82% 50%;
+    --mana-green: 150 100% 25%;
+    --mana-gold: 45 100% 65%;
+    --mana-artifact: 210 10% 70%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
+    /* Dark theme - Deep mystical colors */
+    --background: 240 10% 3%;
+    --foreground: 210 40% 95%;
+    --card: 240 8% 8%;
+    --card-foreground: 210 40% 95%;
+    --popover: 240 8% 8%;
+    --popover-foreground: 210 40% 95%;
+    --primary: 262 80% 65%;
+    --primary-foreground: 240 10% 3%;
+    --secondary: 240 6% 12%;
+    --secondary-foreground: 210 40% 90%;
+    --muted: 240 6% 12%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 240 6% 12%;
+    --accent-foreground: 210 40% 90%;
+    --destructive: 0 75% 55%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 94.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --border: 240 6% 18%;
+    --input: 240 6% 18%;
+    --ring: 262 80% 65%;
+    --chart-1: 262 80% 65%;
+    --chart-2: 213 100% 60%;
+    --chart-3: 0 75% 55%;
+    --chart-4: 150 80% 45%;
+    --chart-5: 45 90% 60%;
+
+    /* MTG Color Variables for Dark Mode */
+    --mana-white: 60 15% 85%;
+    --mana-blue: 213 80% 55%;
+    --mana-black: 240 15% 15%;
+    --mana-red: 1 75% 60%;
+    --mana-green: 150 70% 40%;
+    --mana-gold: 45 85% 70%;
+    --mana-artifact: 210 15% 60%;
   }
 }
 
@@ -77,5 +97,91 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
+    background-image:
+      radial-gradient(circle at 20% 80%, hsl(var(--muted)) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, hsl(var(--muted)) 0%, transparent 50%);
+  }
+}
+
+/* MTG-inspired utility classes */
+@layer utilities {
+  .card-frame {
+    background: linear-gradient(145deg, hsl(var(--card)), hsl(var(--muted)));
+    border: 2px solid hsl(var(--border));
+    border-radius: calc(var(--radius) + 2px);
+    box-shadow:
+      0 4px 8px -2px hsl(var(--foreground) / 0.1),
+      0 0 0 1px hsl(var(--foreground) / 0.05),
+      inset 0 1px 0 hsl(var(--foreground) / 0.1);
+  }
+
+  .card-frame:hover {
+    border-color: hsl(var(--primary));
+    box-shadow:
+      0 8px 16px -4px hsl(var(--foreground) / 0.15),
+      0 0 0 1px hsl(var(--primary) / 0.5),
+      inset 0 1px 0 hsl(var(--foreground) / 0.1);
+    transform: translateY(-2px);
+    transition: all 0.2s ease-in-out;
+  }
+
+  .mtg-card-image {
+    border-radius: calc(var(--radius) + 1px);
+    box-shadow:
+      0 4px 12px -2px hsl(var(--foreground) / 0.2),
+      0 0 0 1px hsl(var(--border));
+    transition: all 0.3s ease-in-out;
+  }
+
+  .mtg-card-image:hover {
+    transform: scale(1.02) translateY(-4px);
+    box-shadow:
+      0 12px 24px -4px hsl(var(--foreground) / 0.3),
+      0 0 0 2px hsl(var(--primary) / 0.8),
+      0 0 20px hsl(var(--primary) / 0.3);
+  }
+
+  .mystical-glow {
+    box-shadow:
+      0 0 10px hsl(var(--primary) / 0.3),
+      0 0 20px hsl(var(--primary) / 0.2),
+      0 0 30px hsl(var(--primary) / 0.1);
+  }
+
+  .mana-white { color: hsl(var(--mana-white)); }
+  .mana-blue { color: hsl(var(--mana-blue)); }
+  .mana-black { color: hsl(var(--mana-black)); }
+  .mana-red { color: hsl(var(--mana-red)); }
+  .mana-green { color: hsl(var(--mana-green)); }
+  .mana-gold { color: hsl(var(--mana-gold)); }
+  .mana-artifact { color: hsl(var(--mana-artifact)); }
+
+  .bg-mana-white { background-color: hsl(var(--mana-white)); }
+  .bg-mana-blue { background-color: hsl(var(--mana-blue)); }
+  .bg-mana-black { background-color: hsl(var(--mana-black)); }
+  .bg-mana-red { background-color: hsl(var(--mana-red)); }
+  .bg-mana-green { background-color: hsl(var(--mana-green)); }
+  .bg-mana-gold { background-color: hsl(var(--mana-gold)); }
+  .bg-mana-artifact { background-color: hsl(var(--mana-artifact)); }
+
+  .section-divider {
+    background: linear-gradient(90deg,
+      transparent 0%,
+      hsl(var(--border)) 20%,
+      hsl(var(--primary)) 50%,
+      hsl(var(--border)) 80%,
+      transparent 100%);
+    height: 2px;
+    border: none;
+  }
+
+  .fantasy-heading {
+    text-shadow: 0 2px 4px hsl(var(--foreground) / 0.3);
+    background: linear-gradient(135deg,
+      hsl(var(--foreground)),
+      hsl(var(--primary)));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 }

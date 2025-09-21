@@ -46,45 +46,64 @@ const DeckDiff: React.FC = () => {
 
 
   const renderDiffEntry = (entry: DeckDiffEntry, index: number) => (
-    <div key={index} className="text-center relative">
+    <div key={index} className="group">
       <div className="relative">
         {entry.card?.image_uris?.normal ? (
           <img
             src={entry.card.image_uris.normal}
             alt={entry.card_name}
-            className="w-full max-w-[200px] mx-auto rounded-lg shadow-md hover:shadow-lg transition-shadow"
+            className="w-full max-w-[200px] mx-auto mtg-card-image"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
             }}
           />
         ) : (
-          <div className="w-full max-w-[200px] mx-auto aspect-[5/7] bg-gray-200 dark:bg-gray-800 rounded-lg flex items-center justify-center">
-            <span className="text-sm text-muted-foreground">No Image</span>
+          <div className="w-full max-w-[200px] mx-auto aspect-[5/7] bg-muted rounded-lg flex items-center justify-center border-2 border-dashed border-border">
+            <div className="text-center">
+              <div className="text-muted-foreground text-sm mb-1">📄</div>
+              <span className="text-xs text-muted-foreground">No Image</span>
+            </div>
           </div>
         )}
+
+        {/* Change type indicator */}
+        <div className="absolute top-2 left-2">
+          <div className={`px-2 py-1 rounded-full text-xs font-bold ${
+            entry.change_type === 'added' ? 'bg-green-500/90 text-white' :
+            entry.change_type === 'removed' ? 'bg-red-500/90 text-white' :
+            entry.change_type === 'modified' ? 'bg-yellow-500/90 text-black' :
+            'bg-gray-500/90 text-white'
+          }`}>
+            {entry.change_type === 'added' ? 'NEW' :
+             entry.change_type === 'removed' ? 'OUT' :
+             entry.change_type === 'modified' ? 'CHG' : 'SAME'}
+          </div>
+        </div>
       </div>
 
-      <div className="mt-2 text-sm space-y-1">
-        <div className="font-medium">{entry.card_name}</div>
-        <div className="text-muted-foreground">
+      <div className="mt-3 text-center space-y-1">
+        <div className="font-semibold text-sm leading-tight group-hover:mana-gold transition-colors">
+          {entry.card_name}
+        </div>
+        <div className="text-xs text-muted-foreground">
           {entry.change_type === 'added' && (
-            <span>
+            <span className="text-green-600 dark:text-green-400">
               {entry.old_quantity > 0
-                ? `${entry.new_quantity}x (was ${entry.old_quantity}x)`
-                : `${entry.new_quantity}x`
+                ? `+${entry.new_quantity - entry.old_quantity} (${entry.new_quantity}x total)`
+                : `+${entry.new_quantity}x`
               }
             </span>
           )}
           {entry.change_type === 'removed' && (
-            <span>
+            <span className="text-red-600 dark:text-red-400">
               {entry.new_quantity > 0
-                ? `${entry.old_quantity}x (now ${entry.new_quantity}x)`
-                : `${entry.old_quantity}x`
+                ? `-${entry.old_quantity - entry.new_quantity} (${entry.new_quantity}x left)`
+                : `-${entry.old_quantity}x`
               }
             </span>
           )}
           {entry.change_type === 'modified' && (
-            <span>
+            <span className="text-yellow-600 dark:text-yellow-400">
               {entry.old_quantity}x → {entry.new_quantity}x
             </span>
           )}
@@ -92,6 +111,18 @@ const DeckDiff: React.FC = () => {
             <span>{entry.old_quantity}x</span>
           )}
         </div>
+        {entry.categories.length > 0 && (
+          <div className="flex flex-wrap justify-center gap-1 opacity-70">
+            {entry.categories.slice(0, 2).map((category, catIndex) => (
+              <span
+                key={catIndex}
+                className="inline-flex items-center px-1.5 py-0.5 text-xs rounded bg-secondary/50 text-secondary-foreground"
+              >
+                {category}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -114,13 +145,16 @@ const DeckDiff: React.FC = () => {
       if (cardEntries.length === 0) return null;
 
       return (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {sectionTitle && (
-            <h4 className="text-md font-semibold text-muted-foreground border-b pb-2">
-              {sectionTitle}
-            </h4>
+            <div className="space-y-3">
+              <h4 className="text-lg font-bold fantasy-heading">
+                {sectionTitle}
+              </h4>
+              <hr className="section-divider" />
+            </div>
           )}
-          <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {cardEntries.map(renderDiffEntry)}
           </div>
         </div>
@@ -128,68 +162,72 @@ const DeckDiff: React.FC = () => {
     };
 
     return (
-      <Card className={`${bgColor} border-2`}>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <Card className={`card-frame ${bgColor} border-2`}>
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl fantasy-heading flex items-center justify-center gap-3">
             {title}
-            <span className="inline-flex items-center px-2 py-1 text-xs rounded-full bg-background border border-border">
+            <span className="inline-flex items-center px-3 py-1 text-sm rounded-full bg-primary/20 text-primary border border-primary/30 mystical-glow">
               {entries.length}
             </span>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-8">
-          {commanders.length > 0 && renderCardGrid(commanders)}
+        <CardContent className="space-y-10">
+          {commanders.length > 0 && renderCardGrid(commanders, "⚔️ Commanders")}
           {others.length > 0 && renderCardGrid(others)}
-          {lands.length > 0 && renderCardGrid(lands, "Lands")}
+          {lands.length > 0 && renderCardGrid(lands, "🏔️ Lands")}
         </CardContent>
       </Card>
     );
   };
 
   return (
-    <div className="w-full space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Deck Diff - Compare Two Decks</CardTitle>
-          <CardDescription>
-            Compare two deck lists to see additions, removals, and quantity changes
+    <div className="w-full space-y-8">
+      <Card className="card-frame">
+        <CardHeader className="text-center">
+          <CardTitle className="text-3xl fantasy-heading">
+            ⚔️ Deck Comparison Ritual
+          </CardTitle>
+          <CardDescription className="text-lg">
+            Compare two deck configurations to reveal their differences
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleDiff} className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Deck 1 (Original)
+          <form onSubmit={handleDiff} className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="space-y-3">
+                <label className="block text-sm font-semibold text-muted-foreground">
+                  📜 Original Deck
                 </label>
                 <Textarea
                   value={deck1Text}
                   onChange={(e) => setDeck1Text(e.target.value)}
-                  placeholder="1x Lightning Bolt&#10;2x Counterspell"
-                  className="min-h-[150px] font-mono text-sm"
+                  placeholder="1x Lightning Bolt&#10;2x Counterspell&#10;1x Forest [Land]"
+                  className="min-h-[160px] font-mono text-sm bg-card border-2 border-border focus:border-primary transition-colors"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Deck 2 (Modified)
+              <div className="space-y-3">
+                <label className="block text-sm font-semibold text-muted-foreground">
+                  📝 Modified Deck
                 </label>
                 <Textarea
                   value={deck2Text}
                   onChange={(e) => setDeck2Text(e.target.value)}
-                  placeholder="2x Lightning Bolt&#10;2x Counterspell&#10;1x Sol Ring"
-                  className="min-h-[150px] font-mono text-sm"
+                  placeholder="2x Lightning Bolt&#10;2x Counterspell&#10;1x Sol Ring [Artifact]"
+                  className="min-h-[160px] font-mono text-sm bg-card border-2 border-border focus:border-primary transition-colors"
                 />
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex justify-center gap-4">
               <Button
                 type="submit"
                 disabled={isLoading || !deck1Text.trim() || !deck2Text.trim()}
+                className="px-8 py-3 text-lg mystical-glow"
+                size="lg"
               >
-                {isLoading ? 'Comparing...' : 'Compare Decks'}
+                {isLoading ? '🔮 Analyzing...' : '⚡ Compare Decks'}
               </Button>
-              <Button type="button" variant="outline" onClick={loadExample}>
-                Load Example
+              <Button type="button" variant="outline" onClick={loadExample} size="lg">
+                📚 Load Example
               </Button>
             </div>
           </form>
@@ -199,35 +237,37 @@ const DeckDiff: React.FC = () => {
       {diffResult && (
         <div className="space-y-6">
           {/* Summary */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Diff Summary</CardTitle>
+          <Card className="card-frame">
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl fantasy-heading">
+                📊 Analysis Results
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 md:grid-cols-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">
+              <div className="grid gap-6 md:grid-cols-4">
+                <div className="text-center p-4 rounded-lg bg-green-500/10 border border-green-500/20">
+                  <div className="text-3xl font-bold text-green-600 dark:text-green-400">
                     {diffResult.added.length}
                   </div>
-                  <div className="text-sm text-muted-foreground">Added</div>
+                  <div className="text-sm font-medium text-green-700 dark:text-green-300">✨ Added</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-red-600">
+                <div className="text-center p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+                  <div className="text-3xl font-bold text-red-600 dark:text-red-400">
                     {diffResult.removed.length}
                   </div>
-                  <div className="text-sm text-muted-foreground">Removed</div>
+                  <div className="text-sm font-medium text-red-700 dark:text-red-300">🗑️ Removed</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-yellow-600">
+                <div className="text-center p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                  <div className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">
                     {diffResult.modified.length}
                   </div>
-                  <div className="text-sm text-muted-foreground">Modified</div>
+                  <div className="text-sm font-medium text-yellow-700 dark:text-yellow-300">🔄 Modified</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-600">
+                <div className="text-center p-4 rounded-lg bg-gray-500/10 border border-gray-500/20">
+                  <div className="text-3xl font-bold text-gray-600 dark:text-gray-400">
                     {diffResult.unchanged.length}
                   </div>
-                  <div className="text-sm text-muted-foreground">Unchanged</div>
+                  <div className="text-sm font-medium text-gray-700 dark:text-gray-300">✓ Unchanged</div>
                 </div>
               </div>
             </CardContent>

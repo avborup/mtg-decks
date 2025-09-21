@@ -21,33 +21,41 @@ function App() {
     <div className="min-h-screen bg-background text-foreground">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
-          <header className="text-center mb-8">
+          <header className="text-center mb-12">
             {/* Theme Toggle */}
-            <div className="flex justify-end mb-4">
+            <div className="flex justify-end mb-6">
               <ThemeToggle />
             </div>
 
-            <h1 className="text-4xl font-bold mb-2">MTG Deck Tool</h1>
-            <p className="text-xl text-muted-foreground">
-              {activeTab === 'viewer'
-                ? 'Enter your MTG deck list and see all the cards with images'
-                : 'Compare two deck lists to see the differences'
-              }
-            </p>
+            <div className="space-y-6">
+              <h1 className="text-5xl font-bold fantasy-heading">
+                🃏 Planeswalker's Arsenal
+              </h1>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                {activeTab === 'viewer'
+                  ? 'Catalog your deck and witness your cards in their full mystical glory'
+                  : 'Analyze the evolution of your deck through arcane comparison magic'
+                }
+              </p>
+            </div>
 
             {/* Tab Navigation */}
-            <div className="flex justify-center gap-2 mt-6">
+            <div className="flex justify-center gap-4 mt-8">
               <Button
                 variant={activeTab === 'viewer' ? 'default' : 'outline'}
                 onClick={() => setActiveTab('viewer')}
+                size="lg"
+                className="px-8 py-3 text-lg"
               >
-                Deck Viewer
+                🔍 Deck Viewer
               </Button>
               <Button
                 variant={activeTab === 'diff' ? 'default' : 'outline'}
                 onClick={() => setActiveTab('diff')}
+                size="lg"
+                className="px-8 py-3 text-lg"
               >
-                Deck Diff
+                ⚔️ Deck Comparison
               </Button>
             </div>
           </header>
