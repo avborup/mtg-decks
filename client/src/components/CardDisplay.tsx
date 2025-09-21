@@ -40,7 +40,7 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ entries }) => {
                   <img
                     src={entry.card.image_uris.normal}
                     alt={entry.card.name}
-                    className="w-full max-w-[200px] mx-auto mtg-card-image"
+                    className="w-full max-w-[200px] mx-auto rounded-lg shadow-md border transition-all duration-300 hover:shadow-lg hover:border-primary/50"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
                     }}
@@ -66,18 +66,6 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ entries }) => {
                 <div className="font-semibold text-sm leading-tight group-hover:mana-gold transition-colors">
                   {entry.card.name}
                 </div>
-                {entry.categories.length > 0 && (
-                  <div className="flex flex-wrap justify-center gap-1 opacity-70">
-                    {entry.categories.slice(0, 2).map((category, catIndex) => (
-                      <span
-                        key={catIndex}
-                        className="inline-flex items-center px-1.5 py-0.5 text-xs rounded bg-secondary/50 text-secondary-foreground"
-                      >
-                        {category}
-                      </span>
-                    ))}
-                  </div>
-                )}
               </div>
             </div>
           ))}
@@ -99,7 +87,7 @@ const CardDisplay: React.FC<CardDisplayProps> = ({ entries }) => {
         </CardHeader>
         <CardContent className="space-y-10">
           {commanders.length > 0 && renderCardGrid(commanders, "⚔️ Commanders")}
-          {others.length > 0 && renderCardGrid(others)}
+          {others.length > 0 && renderCardGrid(others, "🎯 Spells & Creatures")}
           {lands.length > 0 && renderCardGrid(lands, "🏔️ Lands")}
         </CardContent>
       </Card>

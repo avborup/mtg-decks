@@ -45,87 +45,74 @@ const DeckDiff: React.FC = () => {
 
 
 
-  const renderDiffEntry = (entry: DeckDiffEntry, index: number) => (
-    <div key={index} className="group">
-      <div className="relative">
-        {entry.card?.image_uris?.normal ? (
-          <img
-            src={entry.card.image_uris.normal}
-            alt={entry.card_name}
-            className="w-full max-w-[200px] mx-auto mtg-card-image"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
-          />
-        ) : (
-          <div className="w-full max-w-[200px] mx-auto aspect-[5/7] bg-muted rounded-lg flex items-center justify-center border-2 border-dashed border-border">
-            <div className="text-center">
-              <div className="text-muted-foreground text-sm mb-1">📄</div>
-              <span className="text-xs text-muted-foreground">No Image</span>
+  const renderDiffEntry = (entry: DeckDiffEntry, index: number) => {
+    const getCardColorClass = () => {
+      switch (entry.change_type) {
+        case 'added':
+          return 'card-added';
+        case 'removed':
+          return 'card-removed';
+        default:
+          return '';
+      }
+    };
+
+    return (
+      <div key={index} className="group">
+        <div className="relative">
+          {entry.card?.image_uris?.normal ? (
+            <img
+              src={entry.card.image_uris.normal}
+              alt={entry.card_name}
+              className={`w-full max-w-[200px] mx-auto rounded-lg shadow-md border transition-all duration-300 hover:shadow-lg ${getCardColorClass()}`}
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          ) : (
+            <div className={`w-full max-w-[200px] mx-auto aspect-[5/7] bg-muted rounded-lg flex items-center justify-center border-2 border-dashed border-border ${getCardColorClass()}`}>
+              <div className="text-center">
+                <div className="text-muted-foreground text-sm mb-1">📄</div>
+                <span className="text-xs text-muted-foreground">No Image</span>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        {/* Change type indicator */}
-        <div className="absolute top-2 left-2">
-          <div className={`px-2 py-1 rounded-full text-xs font-bold ${
-            entry.change_type === 'added' ? 'bg-green-500/90 text-white' :
-            entry.change_type === 'removed' ? 'bg-red-500/90 text-white' :
-            entry.change_type === 'modified' ? 'bg-yellow-500/90 text-black' :
-            'bg-gray-500/90 text-white'
-          }`}>
-            {entry.change_type === 'added' ? 'NEW' :
-             entry.change_type === 'removed' ? 'OUT' :
-             entry.change_type === 'modified' ? 'CHG' : 'SAME'}
+        <div className="mt-3 text-center space-y-1">
+          <div className="font-semibold text-sm leading-tight group-hover:mana-gold transition-colors">
+            {entry.card_name}
           </div>
-        </div>
-      </div>
-
-      <div className="mt-3 text-center space-y-1">
-        <div className="font-semibold text-sm leading-tight group-hover:mana-gold transition-colors">
-          {entry.card_name}
-        </div>
-        <div className="text-xs text-muted-foreground">
-          {entry.change_type === 'added' && (
-            <span className="text-green-600 dark:text-green-400">
-              {entry.old_quantity > 0
-                ? `+${entry.new_quantity - entry.old_quantity} (${entry.new_quantity}x total)`
-                : `+${entry.new_quantity}x`
-              }
-            </span>
-          )}
-          {entry.change_type === 'removed' && (
-            <span className="text-red-600 dark:text-red-400">
-              {entry.new_quantity > 0
-                ? `-${entry.old_quantity - entry.new_quantity} (${entry.new_quantity}x left)`
-                : `-${entry.old_quantity}x`
-              }
-            </span>
-          )}
-          {entry.change_type === 'modified' && (
-            <span className="text-yellow-600 dark:text-yellow-400">
-              {entry.old_quantity}x → {entry.new_quantity}x
-            </span>
-          )}
-          {entry.change_type === 'unchanged' && (
-            <span>{entry.old_quantity}x</span>
-          )}
-        </div>
-        {entry.categories.length > 0 && (
-          <div className="flex flex-wrap justify-center gap-1 opacity-70">
-            {entry.categories.slice(0, 2).map((category, catIndex) => (
-              <span
-                key={catIndex}
-                className="inline-flex items-center px-1.5 py-0.5 text-xs rounded bg-secondary/50 text-secondary-foreground"
-              >
-                {category}
+          <div className="text-xs text-muted-foreground">
+            {entry.change_type === 'added' && (
+              <span className="text-green-600 dark:text-green-400">
+                {entry.old_quantity > 0
+                  ? `+${entry.new_quantity - entry.old_quantity} (${entry.new_quantity}x total)`
+                  : `+${entry.new_quantity}x`
+                }
               </span>
-            ))}
+            )}
+            {entry.change_type === 'removed' && (
+              <span className="text-red-600 dark:text-red-400">
+                {entry.new_quantity > 0
+                  ? `-${entry.old_quantity - entry.new_quantity} (${entry.new_quantity}x left)`
+                  : `-${entry.old_quantity}x`
+                }
+              </span>
+            )}
+            {entry.change_type === 'modified' && (
+              <span className="text-yellow-600 dark:text-yellow-400">
+                {entry.old_quantity}x → {entry.new_quantity}x
+              </span>
+            )}
+            {entry.change_type === 'unchanged' && (
+              <span>{entry.old_quantity}x</span>
+            )}
           </div>
-        )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderDiffSection = (
     title: string,
@@ -173,7 +160,7 @@ const DeckDiff: React.FC = () => {
         </CardHeader>
         <CardContent className="space-y-10">
           {commanders.length > 0 && renderCardGrid(commanders, "⚔️ Commanders")}
-          {others.length > 0 && renderCardGrid(others)}
+          {others.length > 0 && renderCardGrid(others, "🎯 Spells & Creatures")}
           {lands.length > 0 && renderCardGrid(lands, "🏔️ Lands")}
         </CardContent>
       </Card>

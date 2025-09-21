@@ -50,6 +50,10 @@
     --mana-green: 150 100% 25%;
     --mana-gold: 45 100% 65%;
     --mana-artifact: 210 10% 70%;
+
+    /* Diff state colors for light mode */
+    --diff-added: 150 40% 35%;
+    --diff-removed: 0 50% 45%;
   }
 
   .dark {
@@ -87,6 +91,10 @@
     --mana-green: 150 70% 40%;
     --mana-gold: 45 85% 70%;
     --mana-artifact: 210 15% 60%;
+
+    /* Diff state colors for dark mode */
+    --diff-added: 150 50% 50%;
+    --diff-removed: 0 60% 60%;
   }
 }
 
@@ -106,7 +114,6 @@
 /* MTG-inspired utility classes */
 @layer utilities {
   .card-frame {
-    background: linear-gradient(145deg, hsl(var(--card)), hsl(var(--muted)));
     border: 2px solid hsl(var(--border));
     border-radius: calc(var(--radius) + 2px);
     box-shadow:
@@ -115,13 +122,16 @@
       inset 0 1px 0 hsl(var(--foreground) / 0.1);
   }
 
-  .card-frame:hover {
+  .card-frame:not([class*="bg-"]) {
+    background: linear-gradient(145deg, hsl(var(--card)), hsl(var(--muted)));
+  }
+
+  .card-frame:hover:not(.border-green-200):not(.border-red-200):not(.border-yellow-200) {
     border-color: hsl(var(--primary));
     box-shadow:
       0 8px 16px -4px hsl(var(--foreground) / 0.15),
       0 0 0 1px hsl(var(--primary) / 0.5),
       inset 0 1px 0 hsl(var(--foreground) / 0.1);
-    transform: translateY(-2px);
     transition: all 0.2s ease-in-out;
   }
 
@@ -134,9 +144,8 @@
   }
 
   .mtg-card-image:hover {
-    transform: scale(1.02) translateY(-4px);
     box-shadow:
-      0 12px 24px -4px hsl(var(--foreground) / 0.3),
+      0 4px 12px -2px hsl(var(--foreground) / 0.2),
       0 0 0 2px hsl(var(--primary) / 0.8),
       0 0 20px hsl(var(--primary) / 0.3);
   }
@@ -183,5 +192,50 @@
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+  }
+
+  /* Card color-coding for diff states */
+  .card-added:hover {
+    border-color: hsl(var(--diff-added));
+    box-shadow:
+      0 4px 12px -2px hsl(var(--foreground) / 0.2),
+      0 0 0 2px hsl(var(--diff-added) / 0.7),
+      0 0 20px hsl(var(--diff-added) / 0.4);
+  }
+
+  .card-removed:hover {
+    border-color: hsl(var(--diff-removed));
+    box-shadow:
+      0 4px 12px -2px hsl(var(--foreground) / 0.2),
+      0 0 0 2px hsl(var(--diff-removed) / 0.7),
+      0 0 20px hsl(var(--diff-removed) / 0.4);
+  }
+
+  /* Section-specific hover states for diff containers */
+  .card-frame.border-green-200:hover {
+    border-color: rgb(34 197 94);
+    box-shadow:
+      0 8px 16px -4px hsl(var(--foreground) / 0.15),
+      0 0 0 1px rgb(34 197 94 / 0.5),
+      inset 0 1px 0 hsl(var(--foreground) / 0.1);
+    transition: all 0.2s ease-in-out;
+  }
+
+  .card-frame.border-red-200:hover {
+    border-color: rgb(239 68 68);
+    box-shadow:
+      0 8px 16px -4px hsl(var(--foreground) / 0.15),
+      0 0 0 1px rgb(239 68 68 / 0.5),
+      inset 0 1px 0 hsl(var(--foreground) / 0.1);
+    transition: all 0.2s ease-in-out;
+  }
+
+  .card-frame.border-yellow-200:hover {
+    border-color: rgb(234 179 8);
+    box-shadow:
+      0 8px 16px -4px hsl(var(--foreground) / 0.15),
+      0 0 0 1px rgb(234 179 8 / 0.5),
+      inset 0 1px 0 hsl(var(--foreground) / 0.1);
+    transition: all 0.2s ease-in-out;
   }
 }
